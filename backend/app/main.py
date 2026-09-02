@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 
-from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -22,7 +22,7 @@ from app.models import (AgentRun, Deployment, Evidence, Hypothesis, Incident, Po
 from app.postmortem import generate_postmortem, postmortem_to_dict
 from app.remediation import (approve_remediation, execute_remediation, propose_remediation,
                              remediation_to_dict)
-from app.schemas import ApprovalRequest, IngestResponse, SettingsOut, TelemetryEventIn
+from app.schemas import ApprovalRequest, IngestResponse, SettingsOut
 from app.security import contains_injection_markers, quarantine_explanation, redact_mapping
 from app.topology_engine import load_topology, topology_dict
 from app.verification import verification_to_dict, verify_recovery
@@ -113,18 +113,27 @@ def impact(service: str, db: Session = Depends(get_db)) -> dict:
 
 # ---------------- telemetry ingestion ----------------
 
-def _event_in_to_raw(e: TelemetryEventIn) -> dict:
-    return e.model_dump()
-
-
 @app.post("/api/telemetry", response_model=IngestResponse)
-def ingest_telemetry(events: list[TelemetryEventIn], db: Session = Depends(get_db)) -> IngestResponse:
-    """Ingest a batch of telemetry events (malformed entries skipped+counted)."""
+async def ingest_telemetry(request: Request, db: Session = Depends(get_db)) -> IngestResponse:
+    """Ingest a batch of telemetry events (malformed entries skipped+counted).
+
+    The raw body is parsed defensively: individual malformed entries are
+    skipped and recorded as parse errors rather than failing the batch.
+    """
     from app.ingestion import ingest_events
 
+    try:
+        payload = await request.json()
+    except Exception:
+        payload = None
+    if not isinstance(payload, list):
+        return IngestResponse(received=0, accepted=0, duplicates=0, malformed=1,
+                              parse_errors=["body: not a JSON array"])
     raws = []
-    for e in events:
-        raw = _event_in_to_raw(e)
+    for raw in payload:
+        if not isinstance(raw, dict):
+            raws.append(raw)  # counted as malformed by ingest_events
+            continue
         # security: redact secrets, flag injection markers
         clean_meta, _ = redact_mapping(raw.get("metadata", {}))
         raw["metadata"] = clean_meta
