@@ -101,10 +101,11 @@ def incident_to_dict(inc: Incident, include_related: bool = False) -> dict:
 
 def build_timeline(db: Session, incident: Incident) -> list[dict]:
     """Incident timeline from signals, logs, deployments, and lifecycle events."""
+    from app.models import Deployment, Remediation, Verification
+
     entries: list[dict] = []
     for signal in incident.signals or []:
         if isinstance(signal, dict):
-            signal.get("deployed_at") or signal.get("explanation", "")
             deployed = signal.get("deployed_at")
             if deployed:
                 entries.append({
@@ -112,9 +113,21 @@ def build_timeline(db: Session, incident: Incident) -> list[dict]:
                     "kind": "deployment",
                     "label": f"Deployment {signal.get('service')} {signal.get('version', '')}",
                 })
+    # deployments of affected services immediately preceding the incident
+    dep_cutoff = incident.started_at - timedelta(minutes=30)
+    services = set(incident.affected_services or [])
+    deployments = db.execute(
+        select(Deployment).where(Deployment.timestamp >= dep_cutoff).order_by(Deployment.timestamp)
+    ).scalars().all()
+    for dep in deployments:
+        if dep.service in services:
+            entries.append({
+                "timestamp": dep.timestamp.isoformat(),
+                "kind": "deployment",
+                "label": f"Deployment {dep.service} {dep.version}",
+            })
     # ERROR/CRITICAL logs within the incident window for affected services
     cutoff = incident.started_at - timedelta(minutes=5)
-    services = set(incident.affected_services or [])
     logs = db.execute(
         select(TelemetryEvent).where(
             TelemetryEvent.severity.in_(["ERROR", "CRITICAL"]),
@@ -128,6 +141,35 @@ def build_timeline(db: Session, incident: Incident) -> list[dict]:
                 "kind": "log",
                 "label": f"[{log.severity}] {log.service}: {log.message[:90]}",
             })
-    entries.append({"timestamp": incident.detected_at.isoformat(), "kind": "incident", "label": f"Incident {incident.id} detected ({incident.severity})"})
+    entries.append({
+        "timestamp": incident.detected_at.isoformat(),
+        "kind": "incident",
+        "label": f"Incident {incident.id} detected ({incident.severity})",
+    })
+    # remediation + verification lifecycle events
+    rems = db.execute(
+        select(Remediation).where(Remediation.incident_id == incident.id).order_by(Remediation.created_at)
+    ).scalars().all()
+    for rem in rems:
+        entries.append({
+            "timestamp": rem.created_at.isoformat(),
+            "kind": "remediation",
+            "label": f"Remediation proposed: {rem.action}",
+        })
+        if rem.executed_at:
+            entries.append({
+                "timestamp": rem.executed_at.isoformat(),
+                "kind": "remediation",
+                "label": f"Remediation executed: {rem.action}",
+            })
+    verifications = db.execute(
+        select(Verification).where(Verification.incident_id == incident.id).order_by(Verification.checked_at)
+    ).scalars().all()
+    for ver in verifications:
+        entries.append({
+            "timestamp": ver.checked_at.isoformat(),
+            "kind": "remediation",
+            "label": f"Recovery verification: {ver.outcome}",
+        })
     entries.sort(key=lambda e: e["timestamp"])
     return entries
