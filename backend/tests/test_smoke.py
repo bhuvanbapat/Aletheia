@@ -1,23 +1,17 @@
-"""Smoke test: full backend import + flagship incident flow end-to-end."""
+"""Smoke test: full backend import + flagship incident flow end-to-end.
+
+The session DB URL is set by conftest.py (single source of truth).
+NOTE: the flagship-flow and evaluation tests mutate shared DB state; they
+clean up after themselves where order matters.
+"""
 from __future__ import annotations
 
-import os
+from fastapi.testclient import TestClient
 
-os.environ["SENTINELOPS_DATABASE_URL"] = "sqlite:///./_smoke_test.db"
-
-from fastapi.testclient import TestClient  # noqa: E402
-
-from app.db import init_db  # noqa: E402
-from app.main import app  # noqa: E402
+from app.db import init_db
+from app.main import app
 
 init_db()
-client = TestClient(app)
-
-
-def _enter():
-    cm = TestClient(app)
-    cm.__enter__()
-    return cm
 
 
 def test_health():
@@ -92,4 +86,6 @@ def test_evaluation_runs():
         assert resp.status_code == 200
         data = resp.json()
         assert data["aggregate"]["n_scenarios"] == 5
+        # honest quality bar: the deterministic pipeline must get most scenarios right
+        assert data["aggregate"]["root_cause_accuracy"] >= 0.6
         print("\nEVALUATION:", data["aggregate"])

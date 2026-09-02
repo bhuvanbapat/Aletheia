@@ -19,9 +19,12 @@ _SECRET_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
 
 # Values that look like literal secrets.
 _SECRET_VALUE_RE = re.compile(
-    r"(?i)(sk-[a-z0-9]{16,}|ghp_[a-z0-9]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----|"
+    r"(?i)(sk-[a-z0-9]{16,}|ghp_[a-z0-9]{20,}|AKIA[0-9A-Z]{16}|"
     r"eyJ[a-zA-Z0-9_-]{20,}\.[a-zA-Z0-9_-]{10,})"
 )
+
+# Full PEM private-key blocks (headers + body), redacted as one unit.
+_PEM_BLOCK_RE = re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----")
 
 _REDACTED = "[REDACTED]"
 
@@ -32,6 +35,9 @@ def redact_text(text: str) -> tuple[str, list[str]]:
     if not text:
         return text, kinds
     clean = text
+    if _PEM_BLOCK_RE.search(clean):
+        clean = _PEM_BLOCK_RE.sub(_REDACTED, clean)
+        kinds.append("private_key")
     if _SECRET_VALUE_RE.search(clean):
         clean = _SECRET_VALUE_RE.sub(_REDACTED, clean)
         kinds.append("value_pattern")
