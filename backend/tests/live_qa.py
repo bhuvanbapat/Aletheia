@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import sys
 import urllib.request
+from datetime import datetime, timedelta, timezone
 
 BASE = "http://localhost:8010"
 failures: list[str] = []
@@ -28,8 +29,11 @@ def check(name: str, fn):
         fn()
         print(f"OK   {name}")
     except Exception as exc:
+        import traceback
+
+        detail = traceback.format_exc().splitlines()[-3:]
         failures.append(name)
-        print(f"FAIL {name}: {exc}")
+        print(f"FAIL {name}: {' | '.join(detail)}")
 
 
 def t_overview():
@@ -93,8 +97,9 @@ def t_incident_flow():
 
 def t_injection_quarantine():
     """Malicious telemetry is stored as data and never executed as instructions."""
+    ts = (datetime.now(timezone.utc) - timedelta(minutes=5)).isoformat()
     events = [{
-        "timestamp": "2026-09-02T00:00:00Z",
+        "timestamp": ts,
         "service": "payments-service",
         "severity": "INFO",
         "event_type": "prompt_injection_test",
