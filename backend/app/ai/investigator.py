@@ -22,11 +22,8 @@ from sqlalchemy.orm import Session
 from app.ai.provider import LLMProvider, build_provider
 from app.ai.tools import ToolRegistry
 from app.config import get_settings
-from app.metrics_engine import detect_anomalies, query_series
 from app.models import AgentRun, Evidence, Hypothesis, Incident, Remediation, ToolCall
 from app.security import redact_text
-from app.synthetic.scenarios import SCENARIOS
-from app.topology_engine import load_topology
 
 INVESTIGATION_SYSTEM_PROMPT = """You are SentinelOps' incident investigator embedded in an SRE platform.
 You reason over structured telemetry evidence collected by deterministic tools.
@@ -140,14 +137,14 @@ class InvestigatorAgent:
 
         # -------- 1. UNDERSTAND: incident + topology --------
         incident_data = tool("get_incident", incident_id=incident.id)
-        topology = tool("get_topology")
+        tool("get_topology")
 
         # -------- 2. EVIDENCE COLLECTION: per affected service --------
         affected = list(incident.affected_services or [])[:6]
         metric_evidence: list[dict] = []
         log_evidence: list[dict] = []
         for svc in affected:
-            svc_info = tool("get_service", service=svc)
+            tool("get_service", service=svc)
             # which metrics exist for this service?
             from sqlalchemy import select
             from app.models import MetricPoint
@@ -227,7 +224,7 @@ class InvestigatorAgent:
                     input_tokens += llm_resp2.input_tokens
                     output_tokens += llm_resp2.output_tokens
                     recommended = self._parse_action(llm_resp2.text, top)
-                except Exception as exc:
+                except Exception:
                     recommended = self._fallback_action(top, deployments)
 
         # -------- 8. PERSIST hypotheses, evidence, remediation, run --------
@@ -246,7 +243,7 @@ class InvestigatorAgent:
             anomaly = ev.get("anomaly")
             desc = (
                 f"{ev['service']}/{ev['metric']}: current {ev.get('current_avg')} vs baseline {ev.get('baseline_avg')}"
-                + (f" — {anomaly['explanation']}" if anomaly else " (within expected range)")
+                + (f" - {anomaly['explanation']}" if anomaly else " (within expected range)")
             )
             self.db.add(Evidence(
                 id=f"ev-{uuid.uuid4().hex[:12]}",
@@ -299,7 +296,7 @@ class InvestigatorAgent:
             {"seq": tc.seq, "tool": tc.tool_name, "status": tc.result_status, "duration_ms": tc.duration_ms}
             for tc in self.db.query(ToolCall).filter(ToolCall.run_id == run.id).order_by(ToolCall.seq).all()
         ]
-        elapsed_ms = (time.monotonic() - started) * 1000
+        (time.monotonic() - started) * 1000
         return InvestigationResult(
             run_id=run.id,
             incident_id=incident.id,

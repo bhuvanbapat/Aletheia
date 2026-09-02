@@ -217,7 +217,7 @@ def generate_post_remediation_window(
     rng = random.Random(seed + 13)
     metrics: list[dict] = []
     for profile in scenario.metrics:
-        ramp = max(1, profile.ramp_minutes)
+        max(1, profile.ramp_minutes)
         recovery = max(1, profile.recovery_minutes)
         # state at remediation time = peak (incident unmitigated until then)
         for minute in range(minutes + 1):

@@ -6,9 +6,8 @@ return toward baseline. Outcomes: recovered | partial | not_recovered | unknown.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.metrics_engine import compute_baseline, query_series
@@ -85,7 +84,7 @@ def verify_recovery(db: Session, incident_id: str, remediation_id: str | None = 
             "gap_closed_pct": round(closure * 100, 1),
         })
         evidence.append(
-            f"{service}/{metric}: peak {peak:.1f} → post-remediation avg {post_mean:.1f} "
+            f"{service}/{metric}: peak {peak:.1f} -> post-remediation avg {post_mean:.1f} "
             f"(baseline {pre_baseline['mean']:.1f}; {closure * 100:.0f}% of gap closed)"
         )
 

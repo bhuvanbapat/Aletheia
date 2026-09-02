@@ -22,7 +22,7 @@ from app.models import (AgentRun, Deployment, Evidence, Hypothesis, Incident, Po
 from app.postmortem import generate_postmortem, postmortem_to_dict
 from app.remediation import (approve_remediation, execute_remediation, propose_remediation,
                              remediation_to_dict)
-from app.schemas import ApprovalRequest, ExecuteRequest, IngestResponse, SettingsOut, TelemetryEventIn
+from app.schemas import ApprovalRequest, IngestResponse, SettingsOut, TelemetryEventIn
 from app.security import contains_injection_markers, quarantine_explanation, redact_mapping
 from app.topology_engine import load_topology, topology_dict
 from app.verification import verification_to_dict, verify_recovery
@@ -55,7 +55,8 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173",
+                   "http://localhost:5174", "http://127.0.0.1:5174"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -457,7 +458,7 @@ def overview(db: Session = Depends(get_db)) -> dict:
         select(Deployment).order_by(Deployment.timestamp.desc()).limit(5)
     ).scalars().all()
     # count anomalies across all metric pairs
-    pairs = db.execute(
+    db.execute(
         select(TelemetryEvent.service).distinct()
     ).scalars().all()
     from app.models import MetricPoint

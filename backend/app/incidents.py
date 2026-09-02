@@ -104,7 +104,7 @@ def build_timeline(db: Session, incident: Incident) -> list[dict]:
     entries: list[dict] = []
     for signal in incident.signals or []:
         if isinstance(signal, dict):
-            ts = signal.get("deployed_at") or signal.get("explanation", "")
+            signal.get("deployed_at") or signal.get("explanation", "")
             deployed = signal.get("deployed_at")
             if deployed:
                 entries.append({

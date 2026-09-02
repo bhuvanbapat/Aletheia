@@ -10,12 +10,10 @@ from __future__ import annotations
 import uuid
 from dataclasses import dataclass
 
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
-from app.metrics_engine import query_series
-from app.models import Deployment, Incident, Remediation, TelemetryEvent, Verification
+from app.models import Incident, Remediation, TelemetryEvent
 from app.synthetic.generator import generate_post_remediation_window
 from app.synthetic.scenarios import SCENARIOS
 

@@ -15,13 +15,11 @@ from sqlalchemy.orm import Session
 
 from app.ai.investigator import InvestigatorAgent
 from app.ingestion import ingest_events, ingest_metric_points
-from app.metrics_engine import query_series
-from app.models import AgentRun, EvaluationCase, Evidence, Incident, ToolCall
+from app.models import EvaluationCase, Evidence, Incident
 from app.remediation import approve_remediation, execute_remediation, propose_remediation
 from app.synthetic.generator import generate_baseline_window, generate_incident_window
 from app.synthetic.scenarios import EVALUATION_SCENARIOS, Scenario
 from app.verification import verify_recovery
-from sqlalchemy.orm import Session as OrmSession
 
 
 def _seed_incident_environment(db: Session, scenario: Scenario, seed: int, incident_id_hint: str) -> Incident:

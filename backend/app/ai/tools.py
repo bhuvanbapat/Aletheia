@@ -9,13 +9,13 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import Any
 
-from sqlalchemy import and_, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.incidents import build_timeline, incident_to_dict
 from app.log_engine import query_logs
 from app.metrics_engine import detect_anomalies, query_series
-from app.models import Deployment, Evidence, Hypothesis, Incident, TelemetryEvent
+from app.models import Deployment, Evidence, Incident
 from app.security import redact_text
 from app.topology_engine import load_topology
 
@@ -74,7 +74,7 @@ class ToolRegistry:
 
     def query_logs(self, service: str = "", severity: str = "", minutes: int = 30, limit: int = 50,
                    search: str = "") -> list[dict]:
-        end = datetime.now(tz=None)  # naive for sqlite comparisons below handled via query params
+        datetime.now(tz=None)  # naive for sqlite comparisons below handled via query params
         logs = query_logs(
             self.db,
             service=service or None,

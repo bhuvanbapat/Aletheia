@@ -75,15 +75,15 @@ def generate_postmortem(db: Session, incident_id: str, use_llm: bool = False) ->
     lines.append("## Timeline")
     for sig in incident.signals or []:
         if isinstance(sig, dict) and sig.get("kind") == "deployment":
-            lines.append(f"- {_fmt_ts(sig.get('deployed_at'))} — Deployment {sig.get('service')} {sig.get('version')}")
+            lines.append(f"- {_fmt_ts(sig.get('deployed_at'))} - Deployment {sig.get('service')} {sig.get('version')}")
     for e in evidence_lines("log"):
         lines.append(f"- Log evidence: {e[:160]}")
-    lines.append(f"- {_fmt_ts(incident.detected_at)} — Incident detected and declared ({incident.severity})")
+    lines.append(f"- {_fmt_ts(incident.detected_at)} - Incident detected and declared ({incident.severity})")
     for r in executed:
-        lines.append(f"- {_fmt_ts(r.executed_at)} — Remediation executed: {r.action}"
+        lines.append(f"- {_fmt_ts(r.executed_at)} - Remediation executed: {r.action}"
                      + (f" on {r.target_service}" if r.target_service else ""))
     for v in verifications:
-        lines.append(f"- {_fmt_ts(v.checked_at)} — Recovery verification: {v.outcome}")
+        lines.append(f"- {_fmt_ts(v.checked_at)} - Recovery verification: {v.outcome}")
     lines.append("")
     lines.append("## Root Cause")
     if top_hyp:
@@ -115,7 +115,7 @@ def generate_postmortem(db: Session, incident_id: str, use_llm: bool = False) ->
     if rem_all:
         for r in rem_all:
             lines.append(f"- {r.action} ({r.status}, approval: {r.approval_state})" +
-                         (f" — {r.reason}" if r.reason else ""))
+                         (f" - {r.reason}" if r.reason else ""))
     else:
         lines.append("- No remediation was proposed or recorded.")
     lines.append("")
@@ -158,9 +158,9 @@ def generate_postmortem(db: Session, incident_id: str, use_llm: bool = False) ->
     lines.append("- Review runbooks for this incident category.")
     lines.append("")
     lines.append("## Follow-up Items")
-    lines.append("- [ ] Owner: SRE team — review alert thresholds for the leading signals in this incident")
-    lines.append("- [ ] Owner: Service team — verify fix/rollback is promoted to all environments")
-    lines.append("- [ ] Owner: Platform — re-run the evaluation benchmark after fixes")
+    lines.append("- [ ] Owner: SRE team - review alert thresholds for the leading signals in this incident")
+    lines.append("- [ ] Owner: Service team - verify fix/rollback is promoted to all environments")
+    lines.append("- [ ] Owner: Platform - re-run the evaluation benchmark after fixes")
 
     content = "\n".join(lines)
     pm = Postmortem(

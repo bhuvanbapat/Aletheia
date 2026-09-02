@@ -196,7 +196,7 @@ class DeploymentRegressionRule(CorrelationRule):
 
 
 class ResourceSaturationRule(CorrelationRule):
-    name = "resource_saturation",
+    name = "resource_saturation"
     category = "resource_saturation"
     severity = "high"
     description = "Memory/CPU saturation with degrading latency and rising errors"
