@@ -77,6 +77,7 @@ class InvestigationResult:
     output_tokens: int
     llm_request_count: int
     tool_calls: list[dict]
+    duration_ms: float = 0.0  # wall-clock investigation duration, set by the caller
 
 
 class InvestigatorAgent:
@@ -147,6 +148,7 @@ class InvestigatorAgent:
             tool("get_service", service=svc)
             # which metrics exist for this service?
             from sqlalchemy import select
+
             from app.models import MetricPoint
             pairs = self.db.execute(
                 select(MetricPoint.metric_name).where(MetricPoint.service == svc).distinct()

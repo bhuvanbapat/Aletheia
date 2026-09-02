@@ -47,14 +47,14 @@ class MockProvider:
         match = re.search(r"```json\s*(\{.*?\})\s*```", user, re.DOTALL)
         if not match:
             match = re.search(r"(\{.*\})", user, re.DOTALL)
+        payload: dict[str, object] = {"summary": "Mock analysis completed using structured evidence only."}
         if match and '"hypotheses"' in user:
             # Hypothesis-generation prompt: derive hypotheses from the evidence keys provided.
-            hypotheses = self._derive_hypotheses(user)
-            payload = {"hypotheses": hypotheses, "reasoning": "Deterministic mock analysis of structured evidence."}
+            payload = {"hypotheses": self._derive_hypotheses(user),
+                       "reasoning": "Deterministic mock analysis of structured evidence."}
         elif match and '"recommended_action"' in user:
-            payload = {"recommended_action": self._derive_action(user), "reasoning": "Grounded in top-ranked hypothesis."}
-        else:
-            payload = {"summary": "Mock analysis completed using structured evidence only."}
+            payload = {"recommended_action": self._derive_action(user),
+                       "reasoning": "Grounded in top-ranked hypothesis."}
         text = json.dumps(payload, indent=2)
         return LLMResponse(
             text=text,
@@ -140,7 +140,7 @@ class MockProvider:
             "latency degradation": 0.05,
         }
 
-        hyps: dict[str, dict] = {}
+        hyps: dict[tuple[str, str], dict] = {}
         for a in anomalies:
             kind = kind_for(a["metric"], a["service"])
             key = (a["service"], kind)
@@ -148,11 +148,11 @@ class MockProvider:
             # agreement. The raw score intentionally exceeds 1.0 in strong cases:
             # ranking must differentiate, clamping happens downstream for display.
             raw_conf = 0.4 + min(a["z"], 8) / 25 + category_bonus(a["metric"]) + KIND_PRIOR.get(kind, 0.0)
-            conf = round(raw_conf, 3)
+            conf = round(raw_conf, 2)
             if key not in hyps or conf > hyps[key]["confidence"]:
                 hyps[key] = {
                     "statement": f"{kind} in {a['service']}",
-                    "confidence": round(conf, 2),
+                    "confidence": conf,
                     "evidence_for": [a["explanation"]],
                     "evidence_against": [],
                 }

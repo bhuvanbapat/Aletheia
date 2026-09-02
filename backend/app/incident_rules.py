@@ -7,7 +7,7 @@ it never invents incidents from scratch.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
@@ -38,7 +38,7 @@ class CorrelationRule:
     severity: str = ""
     description: str = ""
 
-    def evaluate(self, ctx: CorrelationContext) -> "RuleResult | None":
+    def evaluate(self, ctx: CorrelationContext) -> RuleResult | None:
         raise NotImplementedError
 
 
@@ -68,7 +68,7 @@ class CorrelationContext:
 
     def error_logs(self, minutes: int | None = None) -> list[TelemetryEvent]:
         latest = self.db.execute(select(MetricPoint.timestamp).order_by(MetricPoint.timestamp.desc())).scalar()
-        cutoff = (latest or datetime.now(timezone.utc)) - timedelta(minutes=minutes or self.window)
+        cutoff = (latest or datetime.now(UTC)) - timedelta(minutes=minutes or self.window)
         stmt = select(TelemetryEvent).where(
             and_(TelemetryEvent.severity.in_(["ERROR", "CRITICAL"]), TelemetryEvent.timestamp >= cutoff)
         ).order_by(TelemetryEvent.timestamp)
@@ -78,7 +78,7 @@ class CorrelationContext:
         if self._recent_deployments is not None and minutes is None:
             return self._recent_deployments
         latest = self.db.execute(select(Deployment.timestamp).order_by(Deployment.timestamp.desc())).scalar()
-        cutoff = (latest or datetime.now(timezone.utc)) - timedelta(minutes=minutes or 24 * 60)
+        cutoff = (latest or datetime.now(UTC)) - timedelta(minutes=minutes or 24 * 60)
         stmt = select(Deployment).where(Deployment.timestamp >= cutoff).order_by(Deployment.timestamp)
         rows = list(self.db.execute(stmt).scalars().all())
         if minutes is None:
@@ -118,10 +118,10 @@ class DatabaseExhaustionRule(CorrelationRule):
                 confidence += 0.2
             # upstream error logs
             err_logs = [
-                l for l in ctx.error_logs()
-                if l.service in ctx.topology.upstream(db_svc) or l.service == db_svc
+                log for log in ctx.error_logs()
+                if log.service in ctx.topology.upstream(db_svc) or log.service == db_svc
             ]
-            timeout_logs = [l for l in err_logs if "timeout" in (l.message or "").lower() or "exhaust" in (l.message or "").lower()]
+            timeout_logs = [log for log in err_logs if "timeout" in (log.message or "").lower() or "exhaust" in (log.message or "").lower()]
             if timeout_logs:
                 confidence += 0.15
                 evidence.append(
@@ -160,7 +160,7 @@ class DeploymentRegressionRule(CorrelationRule):
             svc_anomalies = [a for a in anomalies if a["service"] == dep.service and a["z_score"] > 0]
             if not svc_anomalies:
                 continue
-            err_logs = [l for l in ctx.error_logs() if l.service == dep.service]
+            err_logs = [log for log in ctx.error_logs() if log.service == dep.service]
             if not err_logs and not svc_anomalies:
                 continue
             confidence = 0.5 + min(0.3, 0.1 * len(svc_anomalies))

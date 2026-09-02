@@ -1,7 +1,7 @@
 """SentinelOps FastAPI application."""
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,11 +17,21 @@ from app.evaluation import run_evaluation
 from app.incidents import build_timeline, detect_incidents, incident_to_dict
 from app.log_engine import count_logs, event_to_dict, log_stats, query_logs
 from app.metrics_engine import detect_anomalies, query_series, summarize_service_metrics
-from app.models import (AgentRun, Deployment, Evidence, Hypothesis, Incident, Postmortem,
-                        Remediation, Service, TelemetryEvent, ToolCall, Verification)
+from app.models import (
+    AgentRun,
+    Deployment,
+    Evidence,
+    Hypothesis,
+    Incident,
+    Postmortem,
+    Remediation,
+    Service,
+    TelemetryEvent,
+    ToolCall,
+    Verification,
+)
 from app.postmortem import generate_postmortem, postmortem_to_dict
-from app.remediation import (approve_remediation, execute_remediation, propose_remediation,
-                             remediation_to_dict)
+from app.remediation import approve_remediation, execute_remediation, propose_remediation, remediation_to_dict
 from app.schemas import ApprovalRequest, IngestResponse, SettingsOut
 from app.security import contains_injection_markers, quarantine_explanation, redact_mapping
 from app.topology_engine import load_topology, topology_dict
@@ -67,7 +77,7 @@ app.add_middleware(
 @app.get("/api/health")
 def health() -> dict:
     return {"status": "ok", "app": settings.app_name, "environment": settings.environment,
-            "synthetic": True, "time": datetime.now(timezone.utc).isoformat()}
+            "synthetic": True, "time": datetime.now(UTC).isoformat()}
 
 
 # ---------------- services & topology ----------------
@@ -142,7 +152,7 @@ async def ingest_telemetry(request: Request, db: Session = Depends(get_db)) -> I
             raw["metadata"] = {**raw["metadata"], "_quarantine": True,
                                "_quarantine_reason": quarantine_explanation(True)}
         raws.append(raw)
-    stats = ingest_events(db, raws, batch_id=f"api-{datetime.now(timezone.utc).strftime('%H%M%S')}")
+    stats = ingest_events(db, raws, batch_id=f"api-{datetime.now(UTC).strftime('%H%M%S')}")
     return IngestResponse(**stats)
 
 
@@ -172,7 +182,7 @@ def logs(
 ) -> dict:
     latest = db.execute(select(func.max(TelemetryEvent.timestamp))).scalar()
     end = latest
-    start = (latest or datetime.now(timezone.utc)) - timedelta(minutes=minutes)
+    start = (latest or datetime.now(UTC)) - timedelta(minutes=minutes)
     rows = query_logs(db, service=service, severity=severity, event_type=event_type,
                       start=start, end=end, search=search, trace_id=trace_id,
                       limit=limit, offset=offset)
@@ -191,7 +201,7 @@ def logs_stats(db: Session = Depends(get_db)) -> dict:
 @app.get("/api/metrics")
 def metrics(service: str, metric: str, minutes: int = 60, db: Session = Depends(get_db)) -> dict:
     latest = db.execute(select(func.max(TelemetryEvent.timestamp))).scalar()
-    start = (latest or datetime.now(timezone.utc)) - timedelta(minutes=minutes)
+    start = (latest or datetime.now(UTC)) - timedelta(minutes=minutes)
     series = query_series(db, service, metric, start=start)
     anomalies = detect_anomalies(query_series(db, service, metric), service, metric)
     return {
@@ -206,7 +216,7 @@ def metrics(service: str, metric: str, minutes: int = 60, db: Session = Depends(
 
 @app.get("/api/deployments")
 def deployments(hours: int = 24, db: Session = Depends(get_db)) -> list[dict]:
-    cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
+    cutoff = datetime.now(UTC) - timedelta(hours=hours)
     rows = db.execute(
         select(Deployment).where(Deployment.timestamp >= cutoff).order_by(Deployment.timestamp.desc())
     ).scalars().all()
@@ -311,7 +321,7 @@ def remediate(incident_id: str, body: dict, db: Session = Depends(get_db)) -> di
                                   expected_effect=body.get("expected_effect", ""),
                                   risk=body.get("risk", "medium"))
     except ValueError as exc:
-        raise HTTPException(400, str(exc))
+        raise HTTPException(400, str(exc)) from exc
     return remediation_to_dict(rem)
 
 
@@ -402,6 +412,9 @@ def agent_runs(incident_id: str | None = None, db: Session = Depends(get_db)) ->
 
 @app.get("/api/agent/runs/{run_id}/trace")
 def agent_trace(run_id: str, db: Session = Depends(get_db)) -> list[dict]:
+    run = db.get(AgentRun, run_id)
+    if run is None:
+        raise HTTPException(404, f"agent run {run_id} not found")
     rows = db.execute(select(ToolCall).where(ToolCall.run_id == run_id).order_by(ToolCall.seq)).scalars().all()
     return [
         {"seq": t.seq, "tool": t.tool_name, "args": t.args, "status": t.result_status,

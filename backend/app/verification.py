@@ -6,7 +6,7 @@ return toward baseline. Outcomes: recovered | partial | not_recovered | unknown.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy.orm import Session
 
@@ -99,7 +99,7 @@ def verify_recovery(db: Session, incident_id: str, remediation_id: str | None = 
         outcome = "not_recovered"
 
     if outcome == "recovered":
-        incident.resolved_at = datetime.now(timezone.utc)
+        incident.resolved_at = datetime.now(UTC)
         incident.status = "resolved"
         evidence.append(f"All {total_measured} measured signals returned to baseline range")
     elif outcome == "partial":

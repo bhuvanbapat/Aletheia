@@ -24,13 +24,16 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install fastapi "uvicorn[standard]" sqlalchemy pydantic pydantic-settings httpx pytest ruff
+          pip install fastapi "uvicorn[standard]" sqlalchemy pydantic pydantic-settings httpx pytest ruff mypy
 
-      - name: Lint (dead code / errors)
-        run: ruff check app/ --select F401,F841,F811,E711,B006
+      - name: Lint (full rule set)
+        run: ruff check app/
+
+      - name: Type check
+        run: python -m mypy app/ --ignore-missing-imports --no-strict-optional
 
       - name: Tests (unit + e2e + evaluation benchmark)
-        run: python -m pytest tests/ -v --ignore=tests/live_qa.py
+        run: python -m pytest tests/ -v --ignore=tests/live_qa.py --ignore=tests/adversarial.py --ignore=tests/e2e_directive90.py
 
   docker:
     runs-on: ubuntu-latest

@@ -26,7 +26,8 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W", "UP", "B"]
-ignore = ["E501"]
+# B008: Depends() in argument defaults is the canonical FastAPI DI pattern.
+ignore = ["E501", "B008"]
 
 [tool.mypy]
 python_version = "3.11"

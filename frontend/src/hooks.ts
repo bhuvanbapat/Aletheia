@@ -25,7 +25,6 @@ export function useApi<T>(path: string | null, deps: unknown[] = []) {
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path, tick, ...deps]);
 
   const refresh = useCallback(() => setTick((t) => t + 1), []);

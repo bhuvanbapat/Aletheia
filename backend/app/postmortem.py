@@ -6,7 +6,7 @@ remediations, verifications). No invented facts.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -51,7 +51,7 @@ def generate_postmortem(db: Session, incident_id: str, use_llm: bool = False) ->
     lines.append(f"# Postmortem: {incident.title}")
     lines.append("")
     lines.append(f"Incident: {incident.id} | Severity: {incident.severity} | Status: {incident.status}")
-    lines.append(f"Generated: {datetime.now(timezone.utc).isoformat()}")
+    lines.append(f"Generated: {datetime.now(UTC).isoformat()}")
     lines.append("")
     lines.append("## Summary")
     summary = (

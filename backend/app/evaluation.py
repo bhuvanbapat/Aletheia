@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import time
 import uuid
+from datetime import UTC
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -25,9 +26,9 @@ from app.verification import verify_recovery
 def _seed_incident_environment(db: Session, scenario: Scenario, seed: int, incident_id_hint: str) -> Incident:
     """Generate telemetry for one scenario and create the ground-truth incident
     record with scenario_id bound (so correlation/detection has ground truth)."""
-    from datetime import datetime, timedelta, timezone
+    from datetime import datetime, timedelta
 
-    base_start = datetime.now(timezone.utc) - timedelta(minutes=65)
+    base_start = datetime.now(UTC) - timedelta(minutes=65)
     base_events, base_metrics = generate_baseline_window(base_start, minutes=50, seed=seed)
     incident_start = base_start + timedelta(minutes=55)
     inc_events, inc_metrics, deployments = generate_incident_window(
@@ -150,7 +151,7 @@ def score_case(scenario_db: Session, main_db: Session, scenario: Scenario, incid
         recovery_verified=recovery_verified,
         tool_calls=n_tools,
         failed_tool_calls=failed_tools,
-        investigation_duration_ms=round(getattr(run, "_duration_ms", 0.0), 1),
+        investigation_duration_ms=round(run.duration_ms, 1),
         score=round(score, 2),
         details={"predicted": predicted, "known": known},
     )
@@ -214,8 +215,7 @@ def run_evaluation(db: Session, seed_offset: int = 0) -> dict:
             t0 = time.monotonic()
             agent = InvestigatorAgent(scenario_db)
             result = agent.investigate(incident)
-            duration_ms = (time.monotonic() - t0) * 1000
-            result._duration_ms = duration_ms
+            result.duration_ms = (time.monotonic() - t0) * 1000
 
             # remediation flow: propose (from investigation), approve, execute, verify
             from app.models import Remediation

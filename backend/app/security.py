@@ -60,12 +60,12 @@ def redact_mapping(obj: dict) -> tuple[dict, list[str]]:
         if matched:
             continue
         if isinstance(value, str):
-            v, vk = redact_text(value)
-            clean[key_s] = v
+            clean_text, vk = redact_text(value)
+            clean[key_s] = clean_text
             kinds.extend(vk)
         elif isinstance(value, dict):
-            v, vk = redact_mapping(value)
-            clean[key_s] = v
+            sub, vk = redact_mapping(value)
+            clean[key_s] = sub
             kinds.extend(vk)
         else:
             clean[key_s] = value

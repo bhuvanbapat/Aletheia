@@ -3,13 +3,14 @@ flagship incident end-to-end so the app is immediately explorable."""
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.ingestion import ingest_events, ingest_metric_points
-from app.models import Deployment as DeploymentModel, Environment, Incident
+from app.models import Deployment as DeploymentModel
+from app.models import Environment, Incident
 from app.synthetic.generator import generate_baseline_window, generate_incident_window
 from app.synthetic.scenarios import DB_EXHAUSTION
 from app.topology_engine import seed_default_topology
@@ -28,7 +29,7 @@ def bootstrap_demo(db: Session, run_flagship_incident: bool = True) -> dict:
             select(Incident).where(Incident.scenario_id == DB_EXHAUSTION.scenario_id)
         ).scalars().first()
         if existing is None:
-            base_start = datetime.now(timezone.utc) - timedelta(minutes=50)
+            base_start = datetime.now(UTC) - timedelta(minutes=50)
             base_events, base_metrics = generate_baseline_window(base_start, minutes=30, seed=7)
             ingest_events(db, base_events, batch_id="demo-baseline")
             ingest_metric_points(db, base_metrics)
@@ -62,7 +63,7 @@ def bootstrap_demo(db: Session, run_flagship_incident: bool = True) -> dict:
                 confidence=0.0,
                 category=DB_EXHAUSTION.category,
                 started_at=incident_start,
-                detected_at=datetime.now(timezone.utc),
+                detected_at=datetime.now(UTC),
                 affected_services=list(DB_EXHAUSTION.expected_affected_services),
                 signals=[
                     {"kind": "metric", "service": p.service, "metric": p.metric}

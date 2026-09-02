@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass
+from datetime import UTC
 
 from sqlalchemy.orm import Session
 
@@ -113,9 +114,9 @@ def execute_remediation(db: Session, remediation_id: str, simulator=None) -> Rem
     incident = db.get(Incident, rem.incident_id)
     scenario = SCENARIOS.get(incident.scenario_id) if incident and incident.scenario_id else None
 
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    executed_at = datetime.now(timezone.utc)
+    executed_at = datetime.now(UTC)
     # simulate action effect: recovery telemetry (against the synthetic env only)
     generated_points = 0
     if scenario is not None:

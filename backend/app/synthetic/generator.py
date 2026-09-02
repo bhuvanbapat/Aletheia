@@ -12,7 +12,7 @@ from __future__ import annotations
 import hashlib
 import math
 import random
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from app.synthetic.scenarios import Scenario
 from app.synthetic.topology import SYNTHETIC_SERVICES
@@ -238,4 +238,4 @@ def generate_post_remediation_window(
 
 
 def utc_now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
