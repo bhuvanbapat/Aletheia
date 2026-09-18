@@ -38,3 +38,4 @@ Thumbs.db
 # Graphify temp state (keep final outputs if desired, exclude working state)
 graphify-out/.graphify_*
 graphify-out/.needs_update
+
