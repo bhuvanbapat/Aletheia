@@ -11,7 +11,7 @@ class Settings(BaseSettings):
 
     app_name: str = "Aletheia"
     environment: str = "demo"
-    database_url: str = "sqlite:///./Aletheia.db"
+    database_url: str = "sqlite:///./aletheia.db"
 
     # LLM provider (OpenAI-compatible). api_key is never hard-coded.
     llm_base_url: str = ""
@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     # Telemetry / synthetic environment
     synthetic_seed: int = 42
 
-    model_config = {"env_prefix": "Aletheia_", "env_file": ".env", "extra": "ignore"}
+    model_config = {"env_prefix": "ALETHEIA_", "env_file": ".env", "extra": "ignore"}
 
     @property
     def llm_enabled(self) -> bool:
@@ -40,4 +40,5 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+
 

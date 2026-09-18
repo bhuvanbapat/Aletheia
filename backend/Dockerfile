@@ -14,7 +14,8 @@ USER sentinel
 
 EXPOSE 8000
 
-ENV Aletheia_DATABASE_URL="sqlite:///./Aletheia.db"
+ENV ALETHEIA_DATABASE_URL="sqlite:///./aletheia.db"
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
 
