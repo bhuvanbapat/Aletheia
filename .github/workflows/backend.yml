@@ -41,11 +41,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build backend image
-        run: docker build -t Aletheia-backend ./backend
+        run: docker build -t aletheia-backend ./backend
       - name: Smoke-check container
         run: |
-          docker run -d --name sentinel-test -p 8000:8000 Aletheia-backend
+          docker run -d --name sentinel-test -p 8000:8000 aletheia-backend
           sleep 6
           curl -sf http://localhost:8000/api/health | grep '"status":"ok"'
           docker rm -f sentinel-test
+
 
