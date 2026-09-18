@@ -2767,11 +2767,11 @@
     },
     {
       "id": "app_main_rationale_1",
-      "label": "SentinelOps FastAPI application.",
+      "label": "Aletheia FastAPI application.",
       "_origin": "ast",
       "community": 0,
       "file_type": "rationale",
-      "norm_label": "sentinelops fastapi application.",
+      "norm_label": "Aletheia fastapi application.",
       "source_file": "app/main.py",
       "source_location": "L1"
     },
@@ -3007,11 +3007,11 @@
     },
     {
       "id": "app_evaluation_rationale_1",
-      "label": "Evaluation engine: benchmark SentinelOps against synthetic incidents with known\u2026",
+      "label": "Evaluation engine: benchmark Aletheia against synthetic incidents with known\u2026",
       "_origin": "ast",
       "community": 1,
       "file_type": "rationale",
-      "norm_label": "evaluation engine: benchmark sentinelops against synthetic incidents with known...",
+      "norm_label": "evaluation engine: benchmark Aletheia against synthetic incidents with known...",
       "source_file": "app/evaluation.py",
       "source_location": "L1"
     },
@@ -3186,13 +3186,13 @@
       "source_location": "L1"
     },
     {
-      "id": "pkg_sentinelops_backend",
-      "label": "sentinelops-backend",
+      "id": "pkg_Aletheia_backend",
+      "label": "Aletheia-backend",
       "_origin": "ast",
       "community": 14,
       "ecosystem": "python",
       "file_type": "code",
-      "norm_label": "sentinelops-backend",
+      "norm_label": "Aletheia-backend",
       "source_file": "pyproject.toml",
       "source_location": "L1",
       "type": "package",
@@ -3320,11 +3320,11 @@
     },
     {
       "id": "app_config_rationale_10",
-      "label": "SentinelOps settings. Secrets are only ever provided via environment.",
+      "label": "Aletheia settings. Secrets are only ever provided via environment.",
       "_origin": "ast",
       "community": 2,
       "file_type": "rationale",
-      "norm_label": "sentinelops settings. secrets are only ever provided via environment.",
+      "norm_label": "Aletheia settings. secrets are only ever provided via environment.",
       "source_file": "app/config.py",
       "source_location": "L10"
     },

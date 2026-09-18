@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to SentinelOps. Format: Keep a Changelog, semantic-ish versioning.
+All notable changes to Aletheia. Format: Keep a Changelog, semantic-ish versioning.
 
 ## [0.1.0] — 2026-09-02
 
@@ -44,3 +44,4 @@ All notable changes to SentinelOps. Format: Keep a Changelog, semantic-ish versi
 - Symptom-over-cause hypothesis ranking (added causal-kind + state-metric
   deployment-link rules).
 - Trailing-comma tuple bug in ResourceSaturationRule.name.
+

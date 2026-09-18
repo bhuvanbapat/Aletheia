@@ -7,11 +7,11 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    """SentinelOps settings. Secrets are only ever provided via environment."""
+    """Aletheia settings. Secrets are only ever provided via environment."""
 
-    app_name: str = "SentinelOps"
+    app_name: str = "Aletheia"
     environment: str = "demo"
-    database_url: str = "sqlite:///./sentinelops.db"
+    database_url: str = "sqlite:///./Aletheia.db"
 
     # LLM provider (OpenAI-compatible). api_key is never hard-coded.
     llm_base_url: str = ""
@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     # Telemetry / synthetic environment
     synthetic_seed: int = 42
 
-    model_config = {"env_prefix": "SENTINELOPS_", "env_file": ".env", "extra": "ignore"}
+    model_config = {"env_prefix": "Aletheia_", "env_file": ".env", "extra": "ignore"}
 
     @property
     def llm_enabled(self) -> bool:
@@ -40,3 +40,4 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+

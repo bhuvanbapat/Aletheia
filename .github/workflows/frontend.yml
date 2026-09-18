@@ -1,4 +1,4 @@
-# SentinelOps frontend — CI
+# Aletheia frontend — CI
 name: frontend-ci
 
 on:
@@ -33,3 +33,4 @@ jobs:
 
       - name: Build
         run: npm run build
+

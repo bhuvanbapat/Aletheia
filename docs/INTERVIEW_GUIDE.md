@@ -1,4 +1,4 @@
-# SentinelOps — Interview Guide
+# Aletheia — Interview Guide
 
 Architecture questions and defensible answers, grounded in this codebase.
 
@@ -105,3 +105,4 @@ Beyond scenario scores: agent-run telemetry (tool calls, failures,
 duration, token estimates), evidence sufficiency per incident, and
 ranking-stability across seeds. Postmortems are auditable against stored
 evidence rows.
+

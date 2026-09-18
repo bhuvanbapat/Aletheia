@@ -25,7 +25,7 @@ from app.config import get_settings
 from app.models import AgentRun, Evidence, Hypothesis, Incident, Remediation, ToolCall
 from app.security import redact_text
 
-INVESTIGATION_SYSTEM_PROMPT = """You are SentinelOps' incident investigator embedded in an SRE platform.
+INVESTIGATION_SYSTEM_PROMPT = """You are Aletheia' incident investigator embedded in an SRE platform.
 You reason over structured telemetry evidence collected by deterministic tools.
 
 STRICT RULES:
@@ -407,3 +407,4 @@ def investigate_incident(db: Session, incident_id: str) -> InvestigationResult |
         return None
     agent = InvestigatorAgent(db)
     return agent.investigate(incident)
+

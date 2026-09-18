@@ -1,4 +1,4 @@
-"""SentinelOps FastAPI application."""
+"""Aletheia FastAPI application."""
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
@@ -57,7 +57,7 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(
-    title="SentinelOps API",
+    title="Aletheia API",
     description="AI SRE & Incident Intelligence Platform - synthetic environment demo",
     version="0.1.0",
     lifespan=lifespan,
@@ -515,3 +515,4 @@ def overview(db: Session = Depends(get_db)) -> dict:
         "anomalies": anomalies_detail[:8],
         "latest_telemetry_time": latest,
     }
+

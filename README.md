@@ -1,6 +1,6 @@
-# SentinelOps — AI SRE & Incident Intelligence Platform
+# Aletheia — AI SRE & Incident Intelligence Platform
 
-SentinelOps ingests telemetry, correlates signals across a service dependency
+Aletheia ingests telemetry, correlates signals across a service dependency
 graph, detects incidents with a deterministic rule engine, and then runs a
 controlled **AI investigation** that must gather evidence before naming a root
 cause. Every conclusion is evidence-backed. Every remediation requires human
@@ -55,17 +55,17 @@ postmortem** → Evaluations → **Run benchmark suite**.
 ## Docker
 
 ```bash
-docker build -t sentinelops-backend ./backend
-docker run -p 8000:8000 sentinelops-backend
+docker build -t Aletheia-backend ./backend
+docker run -p 8000:8000 Aletheia-backend
 # API at http://localhost:8000 — OpenAPI docs at /docs
 ```
 
 ## Enabling a real LLM (optional)
 
 ```bash
-export SENTINELOPS_LLM_BASE_URL=https://api.openai.com/v1   # or any OpenAI-compatible endpoint
-export SENTINELOPS_LLM_API_KEY=...
-export SENTINELOPS_LLM_MODEL=gpt-4o-mini
+export Aletheia_LLM_BASE_URL=https://api.openai.com/v1   # or any OpenAI-compatible endpoint
+export Aletheia_LLM_API_KEY=...
+export Aletheia_LLM_MODEL=gpt-4o-mini
 ```
 
 Without a key the platform runs in deterministic **mock mode** — the full
@@ -118,3 +118,4 @@ python tests/live_qa.py             # 9 live checks against a running server
 
 See `docs/` for the full architecture, threat model, evaluation methodology,
 ADRs, and an interview prep guide.
+

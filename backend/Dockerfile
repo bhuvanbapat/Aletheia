@@ -1,4 +1,4 @@
-# SentinelOps backend — synthetic-environment demo image
+# Aletheia backend — synthetic-environment demo image
 FROM python:3.12-slim
 
 WORKDIR /app
@@ -14,6 +14,7 @@ USER sentinel
 
 EXPOSE 8000
 
-ENV SENTINELOPS_DATABASE_URL="sqlite:///./sentinelops.db"
+ENV Aletheia_DATABASE_URL="sqlite:///./Aletheia.db"
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+

@@ -1,4 +1,4 @@
-# SentinelOps Architecture
+# Aletheia Architecture
 
 ## System overview
 
@@ -144,7 +144,7 @@ The system prompt binds telemetry as **DATA** (see docs/SECURITY.md).
 `LLMProvider` protocol with two implementations:
 - `OpenAICompatibleProvider` — any `/chat/completions` endpoint (OpenAI,
   vLLM, Ollama, LM Studio). Credentials arrive ONLY via environment
-  (`SENTINELOPS_LLM_*`).
+  (`Aletheia_LLM_*`).
 - `MockProvider` — deterministic, zero-cost. Parses the evidence JSON block
   from the prompt and derives hypotheses from real collected values.
 
@@ -174,8 +174,9 @@ Each is scored on root-cause accuracy, affected-service accuracy, remediation
 correctness, recovery verification, evidence count, tool calls, and duration.
 See docs/EVALUATION.md.
 
-## Observability of SentinelOps itself
+## Observability of Aletheia itself
 
 `AgentRun` + `ToolCall` record: tool name, args, duration, status, result
 summary, token estimates, LLM request counts, stop reason. The UI exposes the
 full trace — the observability platform is itself observable.
+

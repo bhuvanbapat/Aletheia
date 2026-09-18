@@ -1,4 +1,4 @@
-# Contributing to SentinelOps
+# Contributing to Aletheia
 
 ## Development setup
 
@@ -56,3 +56,4 @@ CI runs the same checks (`.github/workflows/`).
 2. Add it to `list_tools()` and `TOOL_NAMES`.
 3. Extend the investigator's loop only if it serves the evidence story —
    the loop is intentionally bounded.
+

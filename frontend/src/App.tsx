@@ -21,7 +21,7 @@ function TopBar() {
   return (
     <header className="topbar">
       <a className="brand" href="#/overview">
-        <span className="brand-dot" /> SentinelOps
+        <span className="brand-dot" /> Aletheia
       </a>
       <span className="spacer" />
       {loading && <span className="top-stat">connecting…</span>}
@@ -84,3 +84,4 @@ export function ErrorBoundary() {
     </div>
   );
 }
+

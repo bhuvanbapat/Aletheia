@@ -1,8 +1,8 @@
-# SentinelOps — Resume Notes
+# Aletheia — Resume Notes
 
 ## Project description (concise)
 
-> SentinelOps — AI-assisted SRE platform: ingests telemetry, correlates
+> Aletheia — AI-assisted SRE platform: ingests telemetry, correlates
 > signals across a service dependency graph, detects incidents with a
 > deterministic rule engine, then runs a controlled AI investigation that
 > must gather evidence before naming root causes. Evidence-backed RCA,
@@ -53,7 +53,7 @@ RCA performance. Saying this unprompted is a strength.
 
 ## Resume bullets (candidates)
 
-- Built SentinelOps, an AI SRE platform pairing a deterministic correlation
+- Built Aletheia, an AI SRE platform pairing a deterministic correlation
   engine (robust modified z-score anomaly detection, service-topology
   impact propagation) with an evidence-first AI investigator that must
   collect telemetry before ranking root-cause hypotheses; 5/5 root-cause
@@ -77,3 +77,4 @@ RCA performance. Saying this unprompted is a strength.
 - Why benchmark DBs are isolated (measurement integrity, found the hard way).
 
 See docs/INTERVIEW_GUIDE.md for the full question set.
+

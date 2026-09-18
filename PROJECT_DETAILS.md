@@ -1,4 +1,4 @@
-# SentinelOps — Complete Project Documentation
+# Aletheia — Complete Project Documentation
 
 > **What this document is:** an exhaustive, inch-by-inch record of everything in this repository —
 > every component, every file, every mechanism, every decision, every bug found and fixed, and
@@ -10,7 +10,7 @@
 ## Table of Contents
 
 1. [The Problem Being Solved](#1-the-problem-being-solved)
-2. [What SentinelOps Is — Precisely](#2-what-sentinelops-is--precisely)
+2. [What Aletheia Is — Precisely](#2-what-Aletheia-is--precisely)
 3. [The Core Idea in One Diagram](#3-the-core-idea-in-one-diagram)
 4. [Repository Map — Every File Explained](#4-repository-map--every-file-explained)
    - 4.1 [Backend application (`backend/app/`)](#41-backend-application)
@@ -62,11 +62,11 @@ When a distributed system breaks, an on-call engineer faces:
   that? What actually recovered?
 
 Existing "AI for SRE" demos mostly pipe logs into an LLM and print a summary. That solves
-none of the above. SentinelOps is built to demonstrate what a *serious* answer looks like.
+none of the above. Aletheia is built to demonstrate what a *serious* answer looks like.
 
-## 2. What SentinelOps Is — Precisely
+## 2. What Aletheia Is — Precisely
 
-SentinelOps is an **AI-assisted SRE and incident-intelligence platform** that:
+Aletheia is an **AI-assisted SRE and incident-intelligence platform** that:
 
 1. **Ingests telemetry** (structured events, metrics, deployments) with normalization,
    deduplication, secret redaction, and malformed-entry resilience.
@@ -168,7 +168,7 @@ All paths relative to `backend/`.
 
 | File | Lines | What it is, in detail |
 |---|---|---|
-| `app/config.py` | 29 | Pydantic-settings configuration. Every knob is env-driven (`SENTINELOPS_*` prefix): DB URL, LLM base URL/key/model/timeout, agent loop limits (max tool calls 40, max repeated calls 3, runtime 120s), remediation mode (default `approval_required`), synthetic seed. `llm_enabled` is a property: true only when base URL, key, and non-"mock" model are ALL set. `@lru_cache` so it's a singleton. |
+| `app/config.py` | 29 | Pydantic-settings configuration. Every knob is env-driven (`Aletheia_*` prefix): DB URL, LLM base URL/key/model/timeout, agent loop limits (max tool calls 40, max repeated calls 3, runtime 120s), remediation mode (default `approval_required`), synthetic seed. `llm_enabled` is a property: true only when base URL, key, and non-"mock" model are ALL set. `@lru_cache` so it's a singleton. |
 | `app/db.py` | 20 | SQLAlchemy 2.0 engine + session factory. `check_same_thread=False` for SQLite; `get_db()` yields a session for FastAPI DI; `init_db()` creates all tables. PostgreSQL is a config change — no SQLite-specific SQL anywhere. |
 | `app/models.py` | 190 | **All 15 entities** (see §9): Environment, Service, Dependency, TelemetryEvent, MetricPoint, Deployment, Incident, Hypothesis, Evidence, AgentRun, ToolCall, Remediation, Verification, Postmortem, EvaluationCase, IngestionStats. Helpers: `utcnow()` (timezone-aware) and `new_id(prefix)` (`"INC-" + 12 hex chars`). |
 | `app/schemas.py` | 46 | Pydantic request/response models: `TelemetryEventIn` (documents the well-formed event shape), `IngestResponse` (received/accepted/duplicates/malformed/parse_errors), `ApprovalRequest` (approver + approved flag), `SettingsOut` (provider, mode, demo flag, limits), `InvestigationOut`. |
@@ -207,7 +207,7 @@ All paths relative to `backend/`.
 
 | File | Lines | What it covers |
 |---|---|---|
-| `tests/conftest.py` | 14 | Sets `SENTINELOPS_DATABASE_URL` to a **unique per-session temp DB** before any app import (the app engine binds at import time). Guarantees zero state leakage between pytest runs — this exists because a resolved incident from a previous run once leaked into the next run's bootstrap check. |
+| `tests/conftest.py` | 14 | Sets `Aletheia_DATABASE_URL` to a **unique per-session temp DB** before any app import (the app engine binds at import time). Guarantees zero state leakage between pytest runs — this exists because a resolved incident from a previous run once leaked into the next run's bootstrap check. |
 | `tests/test_ingestion.py` | 77 | Normalization (lowercase severity, epoch timestamps, missing fields → None, non-dict → None), malformed-batch counting (never crashes), deduplication (same content twice → 1 stored + 1 counted duplicate), out-of-order events, defensive metadata handling. |
 | `tests/test_metrics_topology.py` | 77 | Baseline computation over synthetic series; anomaly detection on spikes (z > 3, explanation contains the actual values) and on stable series (no anomaly); **decrease detection** (cache-hit collapse → negative z); EWMA math; topology downstream/upstream; impact radius propagation (orders-db → payments/orders/gateway); descendants; propagation-path stages. |
 | `tests/test_security_ai.py` | 63 | Secret-key redaction (api_key/password/client_secret), secret-value redaction (JWT), PEM block redaction (body removed), nested metadata, injection-marker detection (positive + negative), quarantine explanation, mock determinism (same input → same output), mock output contains no secrets, remediation whitelist excludes dangerous verbs (shutdown, rm -rf, format, exec). |
@@ -561,7 +561,7 @@ fabricated fact because every line template references a queried field.
 | Alert-storm defense | incident dedup | category + service-overlap suppression |
 | Loop safety | agent | 40-call cap, repeat tracking, wall-clock budget, recorded stop reasons |
 | Measurement integrity | benchmark isolation + verification engine | isolated scenario DBs; recovery only from measured telemetry |
-| Credential hygiene | config | env-only (`SENTINELOPS_LLM_API_KEY`); `.env` git-ignored; repo-wide secret scan clean |
+| Credential hygiene | config | env-only (`Aletheia_LLM_API_KEY`); `.env` git-ignored; repo-wide secret scan clean |
 
 ### 5.14 Agent observability — the platform observing itself
 
@@ -780,8 +780,8 @@ lineage, committed 2026-09-02). Nothing is claimed without a command that produc
   and regression bar, NOT a claim of real-world RCA performance.
 
 ### Container
-- `docker build -t sentinelops-backend ./backend`: succeeds
-- Container `/api/health`: `{"status":"ok","app":"SentinelOps","environment":"demo","synthetic":true}`
+- `docker build -t Aletheia-backend ./backend`: succeeds
+- Container `/api/health`: `{"status":"ok","app":"Aletheia","environment":"demo","synthetic":true}`
 - **Full lifecycle executed inside a container**: investigate → root cause → approve →
   execute → verification `recovered` → postmortem containing the correct root cause.
 
@@ -834,13 +834,13 @@ npm install
 npm run dev          # opens e.g. http://localhost:5174
 
 # ── Docker ──────────────────────────────────────────────────
-docker build -t sentinelops-backend ./backend
-docker run -p 8000:8000 sentinelops-backend
+docker build -t Aletheia-backend ./backend
+docker run -p 8000:8000 Aletheia-backend
 
 # ── Optional: real LLM (any OpenAI-compatible endpoint) ─────
-export SENTINELOPS_LLM_BASE_URL=https://api.openai.com/v1
-export SENTINELOPS_LLM_API_KEY=...
-export SENTINELOPS_LLM_MODEL=gpt-4o-mini
+export Aletheia_LLM_BASE_URL=https://api.openai.com/v1
+export Aletheia_LLM_API_KEY=...
+export Aletheia_LLM_MODEL=gpt-4o-mini
 # (absent these → deterministic mock mode, labeled DEMO MODE in the UI)
 
 # ── Quality gates (what CI runs) ─────────────────────────────
@@ -868,3 +868,4 @@ docs/DEMO.md and watch the system store it as inert, redacted data.
 
 *This document describes the repository exactly as committed. Every claim above traces
 to a command that was actually run; where something is untested or synthetic, it says so.*
+

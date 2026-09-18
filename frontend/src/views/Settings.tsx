@@ -42,8 +42,8 @@ export default function Settings() {
             </table>
           )}
           <p className="dim" style={{ fontSize: 12, marginTop: 10 }}>
-            Configure via environment: SENTINELOPS_LLM_BASE_URL, SENTINELOPS_LLM_API_KEY,
-            SENTINELOPS_LLM_MODEL. Without a key, the platform runs fully in deterministic mock mode.
+            Configure via environment: Aletheia_LLM_BASE_URL, Aletheia_LLM_API_KEY,
+            Aletheia_LLM_MODEL. Without a key, the platform runs fully in deterministic mock mode.
           </p>
         </div>
 
@@ -107,3 +107,4 @@ export default function Settings() {
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-# SentinelOps Evaluation Methodology
+# Aletheia Evaluation Methodology
 
 ## Purpose
 
@@ -88,3 +88,4 @@ deployment-regression scenario now also scores 1.0.
 - Concept matching rewards naming the right concepts; a real grader might
   also want causal-mechanism explanation quality.
 - Scenarios are seeded and reproducible; unseen scenarios are not measured.
+

@@ -1,4 +1,4 @@
-# SentinelOps Demo Guide
+# Aletheia Demo Guide
 
 All demos run in **deterministic mock mode** — no API key, no external
 service, clearly labeled `SYNTHETIC DEMO` in the top bar.
@@ -107,3 +107,4 @@ curl -X POST http://localhost:8010/api/telemetry -H "Content-Type: application/j
 
 Then check **Logs** (search `shut down`): the event is stored as data with
 `api_key: [REDACTED]` and a `_quarantine` flag — and nothing obeys it.
+

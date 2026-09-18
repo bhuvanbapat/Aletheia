@@ -10,7 +10,7 @@ traces) is inherently relational.
 ## Decision
 SQLAlchemy 2.0 ORM over SQLite with an explicit, typed schema
 (`app/models.py`). No database-specific features are used; the engine is
-configured via `SENTINELOPS_DATABASE_URL`, so PostgreSQL is a config
+configured via `Aletheia_DATABASE_URL`, so PostgreSQL is a config
 change. Benchmark scenarios use isolated in-memory SQLite instances so
 measurements cannot cross-contaminate.
 
@@ -19,3 +19,4 @@ measurements cannot cross-contaminate.
 - Write concurrency is limited (fine for a single-process monolith);
   porting to Postgres for multi-process deployment is straightforward
   because no SQLite-specific SQL was written.
+

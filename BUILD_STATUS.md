@@ -1,4 +1,4 @@
-# SentinelOps Build Status
+# Aletheia Build Status
 
 Last updated: 2026-09-02 (final QA pass)
 
@@ -42,7 +42,7 @@ Last updated: 2026-09-02 (final QA pass)
 - `python tests/live_qa.py` (against running uvicorn) → **ALL LIVE QA CHECKS PASSED**
 - `npx tsc --noEmit -p tsconfig.app.json` → clean
 - `npm run build` → succeeds
-- `docker run sentinelops-backend` → `/api/health` = `{"status":"ok",...}`
+- `docker run Aletheia-backend` → `/api/health` = `{"status":"ok",...}`
 - Evaluation benchmark (deterministic mock mode): root-cause 5/5, services
   5/5, remediation 5/5, recovery 5/5, average score 1.00 (synthetic
   ground-truth scenarios; limitations documented in docs/EVALUATION.md)
@@ -57,3 +57,4 @@ Last updated: 2026-09-02 (final QA pass)
   ASCII-safe user-facing strings, dead helper removed, permissive ingestion.
 - Live QA: 9/9 including full lifecycle, injection quarantine, malformed batch.
 - Docker + CI verified. Documentation completed. 28/28 tests green.
+

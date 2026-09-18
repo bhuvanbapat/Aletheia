@@ -1,7 +1,7 @@
 [project]
-name = "sentinelops-backend"
+name = "Aletheia-backend"
 version = "0.1.0"
-description = "SentinelOps - AI SRE & Incident Intelligence Platform (backend)"
+description = "Aletheia - AI SRE & Incident Intelligence Platform (backend)"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115",
@@ -37,3 +37,4 @@ warn_unused_ignores = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+

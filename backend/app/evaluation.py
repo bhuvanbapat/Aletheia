@@ -1,4 +1,4 @@
-"""Evaluation engine: benchmark SentinelOps against synthetic incidents with
+"""Evaluation engine: benchmark Aletheia against synthetic incidents with
 known ground truth. Scores root-cause accuracy, affected-service accuracy,
 evidence quality, remediation correctness, and recovery verification.
 
@@ -273,3 +273,4 @@ def run_evaluation(db: Session, seed_offset: int = 0) -> dict:
             "n_scenarios": total,
         },
     }
+
