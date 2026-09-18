@@ -14,5 +14,6 @@ import uuid
 
 _test_dir = os.path.dirname(os.path.abspath(__file__))
 _db_name = f"_test_{uuid.uuid4().hex[:8]}.db"
-os.environ["Aletheia_DATABASE_URL"] = f"sqlite:///{os.path.join(_test_dir, _db_name)}"
+os.environ["ALETHEIA_DATABASE_URL"] = f"sqlite:///{os.path.join(_test_dir, _db_name)}"
+
 

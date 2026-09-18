@@ -5,7 +5,7 @@ Supports:
     grounded investigation artifacts from structured evidence (never fabricated).
   - OpenAICompatibleProvider: any OpenAI-compatible endpoint via env config.
 
-Secrets only ever arrive via environment variables (Aletheia_LLM_API_KEY).
+Secrets only ever arrive via environment variables (ALETHEIA_LLM_API_KEY).
 """
 from __future__ import annotations
 
@@ -278,4 +278,5 @@ def build_provider(settings: Settings) -> LLMProvider:
             timeout=settings.llm_timeout_seconds,
         )
     return MockProvider()
+
 

@@ -168,7 +168,7 @@ All paths relative to `backend/`.
 
 | File | Lines | What it is, in detail |
 |---|---|---|
-| `app/config.py` | 29 | Pydantic-settings configuration. Every knob is env-driven (`Aletheia_*` prefix): DB URL, LLM base URL/key/model/timeout, agent loop limits (max tool calls 40, max repeated calls 3, runtime 120s), remediation mode (default `approval_required`), synthetic seed. `llm_enabled` is a property: true only when base URL, key, and non-"mock" model are ALL set. `@lru_cache` so it's a singleton. |
+| `app/config.py` | 29 | Pydantic-settings configuration. Every knob is env-driven (`ALETHEIA_*` prefix): DB URL, LLM base URL/key/model/timeout, agent loop limits (max tool calls 40, max repeated calls 3, runtime 120s), remediation mode (default `approval_required`), synthetic seed. `llm_enabled` is a property: true only when base URL, key, and non-"mock" model are ALL set. `@lru_cache` so it's a singleton. |
 | `app/db.py` | 20 | SQLAlchemy 2.0 engine + session factory. `check_same_thread=False` for SQLite; `get_db()` yields a session for FastAPI DI; `init_db()` creates all tables. PostgreSQL is a config change — no SQLite-specific SQL anywhere. |
 | `app/models.py` | 190 | **All 15 entities** (see §9): Environment, Service, Dependency, TelemetryEvent, MetricPoint, Deployment, Incident, Hypothesis, Evidence, AgentRun, ToolCall, Remediation, Verification, Postmortem, EvaluationCase, IngestionStats. Helpers: `utcnow()` (timezone-aware) and `new_id(prefix)` (`"INC-" + 12 hex chars`). |
 | `app/schemas.py` | 46 | Pydantic request/response models: `TelemetryEventIn` (documents the well-formed event shape), `IngestResponse` (received/accepted/duplicates/malformed/parse_errors), `ApprovalRequest` (approver + approved flag), `SettingsOut` (provider, mode, demo flag, limits), `InvestigationOut`. |
@@ -207,7 +207,7 @@ All paths relative to `backend/`.
 
 | File | Lines | What it covers |
 |---|---|---|
-| `tests/conftest.py` | 14 | Sets `Aletheia_DATABASE_URL` to a **unique per-session temp DB** before any app import (the app engine binds at import time). Guarantees zero state leakage between pytest runs — this exists because a resolved incident from a previous run once leaked into the next run's bootstrap check. |
+| `tests/conftest.py` | 14 | Sets `ALETHEIA_DATABASE_URL` to a **unique per-session temp DB** before any app import (the app engine binds at import time). Guarantees zero state leakage between pytest runs — this exists because a resolved incident from a previous run once leaked into the next run's bootstrap check. |
 | `tests/test_ingestion.py` | 77 | Normalization (lowercase severity, epoch timestamps, missing fields → None, non-dict → None), malformed-batch counting (never crashes), deduplication (same content twice → 1 stored + 1 counted duplicate), out-of-order events, defensive metadata handling. |
 | `tests/test_metrics_topology.py` | 77 | Baseline computation over synthetic series; anomaly detection on spikes (z > 3, explanation contains the actual values) and on stable series (no anomaly); **decrease detection** (cache-hit collapse → negative z); EWMA math; topology downstream/upstream; impact radius propagation (orders-db → payments/orders/gateway); descendants; propagation-path stages. |
 | `tests/test_security_ai.py` | 63 | Secret-key redaction (api_key/password/client_secret), secret-value redaction (JWT), PEM block redaction (body removed), nested metadata, injection-marker detection (positive + negative), quarantine explanation, mock determinism (same input → same output), mock output contains no secrets, remediation whitelist excludes dangerous verbs (shutdown, rm -rf, format, exec). |
@@ -561,7 +561,7 @@ fabricated fact because every line template references a queried field.
 | Alert-storm defense | incident dedup | category + service-overlap suppression |
 | Loop safety | agent | 40-call cap, repeat tracking, wall-clock budget, recorded stop reasons |
 | Measurement integrity | benchmark isolation + verification engine | isolated scenario DBs; recovery only from measured telemetry |
-| Credential hygiene | config | env-only (`Aletheia_LLM_API_KEY`); `.env` git-ignored; repo-wide secret scan clean |
+| Credential hygiene | config | env-only (`ALETHEIA_LLM_API_KEY`); `.env` git-ignored; repo-wide secret scan clean |
 
 ### 5.14 Agent observability — the platform observing itself
 
@@ -838,9 +838,9 @@ docker build -t Aletheia-backend ./backend
 docker run -p 8000:8000 Aletheia-backend
 
 # ── Optional: real LLM (any OpenAI-compatible endpoint) ─────
-export Aletheia_LLM_BASE_URL=https://api.openai.com/v1
-export Aletheia_LLM_API_KEY=...
-export Aletheia_LLM_MODEL=gpt-4o-mini
+export ALETHEIA_LLM_BASE_URL=https://api.openai.com/v1
+export ALETHEIA_LLM_API_KEY=...
+export ALETHEIA_LLM_MODEL=gpt-4o-mini
 # (absent these → deterministic mock mode, labeled DEMO MODE in the UI)
 
 # ── Quality gates (what CI runs) ─────────────────────────────
@@ -868,4 +868,5 @@ docs/DEMO.md and watch the system store it as inert, redacted data.
 
 *This document describes the repository exactly as committed. Every claim above traces
 to a command that was actually run; where something is untested or synthetic, it says so.*
+
 

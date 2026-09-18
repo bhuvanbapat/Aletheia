@@ -43,7 +43,7 @@ The system prompt establishes the core rule:
 ## What is intentionally absent
 
 - No endpoint executes shell commands or writes arbitrary files.
-- No secret is ever read from code; only `Aletheia_LLM_API_KEY` (env).
+- No secret is ever read from code; only `ALETHEIA_LLM_API_KEY` (env).
 - No real credentials exist in the repo (verified: `.env` git-ignored).
 
 ## Verification in tests
@@ -54,4 +54,5 @@ quarantine explanation, mock determinism, and the absence of dangerous
 actions from the whitelist. `tests/live_qa.py` proves live that a malicious
 log is stored with `[REDACTED]` secrets and a quarantine flag — and that the
 system keeps operating.
+
 

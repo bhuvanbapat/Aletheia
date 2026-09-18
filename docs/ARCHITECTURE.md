@@ -144,7 +144,7 @@ The system prompt binds telemetry as **DATA** (see docs/SECURITY.md).
 `LLMProvider` protocol with two implementations:
 - `OpenAICompatibleProvider` — any `/chat/completions` endpoint (OpenAI,
   vLLM, Ollama, LM Studio). Credentials arrive ONLY via environment
-  (`Aletheia_LLM_*`).
+  (`ALETHEIA_LLM_*`).
 - `MockProvider` — deterministic, zero-cost. Parses the evidence JSON block
   from the prompt and derives hypotheses from real collected values.
 
@@ -179,4 +179,5 @@ See docs/EVALUATION.md.
 `AgentRun` + `ToolCall` record: tool name, args, duration, status, result
 summary, token estimates, LLM request counts, stop reason. The UI exposes the
 full trace — the observability platform is itself observable.
+
 

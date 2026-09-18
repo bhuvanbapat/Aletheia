@@ -63,9 +63,9 @@ docker run -p 8000:8000 Aletheia-backend
 ## Enabling a real LLM (optional)
 
 ```bash
-export Aletheia_LLM_BASE_URL=https://api.openai.com/v1   # or any OpenAI-compatible endpoint
-export Aletheia_LLM_API_KEY=...
-export Aletheia_LLM_MODEL=gpt-4o-mini
+export ALETHEIA_LLM_BASE_URL=https://api.openai.com/v1   # or any OpenAI-compatible endpoint
+export ALETHEIA_LLM_API_KEY=...
+export ALETHEIA_LLM_MODEL=gpt-4o-mini
 ```
 
 Without a key the platform runs in deterministic **mock mode** — the full
@@ -118,4 +118,5 @@ python tests/live_qa.py             # 9 live checks against a running server
 
 See `docs/` for the full architecture, threat model, evaluation methodology,
 ADRs, and an interview prep guide.
+
 
